@@ -22,7 +22,7 @@ df = xf[1]-xf[0]
 
 
 ###### To do: Get fourier transforms of s and h and get the likelihood
-'''
+''
 tau = 1
 freq = 1020
 h = mf.damped_sin(t,tau,freq,10)
@@ -44,7 +44,7 @@ plt.clf()
 
 tau_array = np.logspace (-1,2, 51)
 print tau_array
-fre_array = np.linspace (1e3,1.02e3, 21)
+fre_array = np.linspace (1e3,1.1e3, 51)
 print fre_array
 
 t_all = np.array([])			# List of tau as each point in parameter space is sampled
@@ -70,12 +70,16 @@ image	= np.histogram2d(t_all,f_all,bins=bins,weights=l_all)
 
 X,Y =np.meshgrid(image[1][:-1],image[2][:-1])
 
-plt.contourf(np.transpose(X),np.transpose(Y),im_base [0])
+plt.contourf(np.transpose(X),np.transpose(Y),image[0]/im_base [0])
 plt.xscale('log')
+plt.title(r'$\tau$ vs Freq')
+plt.xlabel(r'$\tau$')
+plt.ylabel('Freq')
 plt.colorbar()
-plt.show()
+plt.savefig('tau_vs_freq.png')
+#plt.show()
 plt.clf()
-'''
+''
 
 
 ####### Testing whether likelihood method works or not
@@ -100,7 +104,7 @@ for fr1 in fre_array1:
 		#~ sf = np.fft.rfft()
 		hf = np.fft.rfft(h)
 		sh = 0.5*( sf*np.conjugate(hf)+ hf*np.conjugate(sf)-hf*np.conjugate(hf))
-		ll = (np.abs(np.sum(sh[1:])*df))
+		ll = np.log10(np.abs(np.sum(sh[1:])*df))
 		f1_all = np.append(f1_all,fr1)
 		f2_all = np.append(f2_all,fr2)
 		l_all = np.append(l_all,ll)
@@ -114,8 +118,12 @@ X,Y =np.meshgrid(image[1][:-1],image[2][:-1])
 
 plt.contourf(np.transpose(X),np.transpose(Y),image[0]/im_base [0])
 #~ plt.xscale('log')
+plt.title ('Freq vs Freq')
+plt.xlabel('Freq')
+plt.ylabel('Freq')
 plt.colorbar()
-plt.show()
+plt.savefig('freq_vs_freq.png')
+#plt.show()
 plt.clf()
 ''
 
@@ -140,7 +148,7 @@ for fr1 in fre_array1:
 		#~ sf = np.fft.rfft()
 		hf = np.fft.rfft(h)
 		sh = 0.5*( sf*np.conjugate(hf)+ hf*np.conjugate(sf)-hf*np.conjugate(hf))
-		ll = (np.abs(np.sum(sh[1:])*df))
+		ll = np.log10(np.abs(np.sum(sh[1:])*df))
 		f1_all = np.append(f1_all,fr1)
 		a1_all = np.append(a1_all,am1)
 		l_all = np.append(l_all,ll)
@@ -155,6 +163,10 @@ X,Y =np.meshgrid(image[1][:-1],image[2][:-1])
 plt.contourf(np.transpose(X),np.transpose(Y),image[0]/im_base [0])
 #~ plt.yscale('log')
 plt.colorbar()
+plt.xlabel('Freq')
+plt.ylabel('Amplitude')
+plt.title('Freq vs Amplitude')
+plt.savefig('freq_vs_amp.png')
 plt.show()
 plt.clf()
 
