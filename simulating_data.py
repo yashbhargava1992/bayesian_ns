@@ -14,10 +14,10 @@ def damped_sin(t,tau,freq,amp=None,phase=None):
 
 
 t = np.arange(0,10,0.0001)
-sig = damped_sin(t,1,1010,10)
+sig = damped_sin(t,1,1010)
 
 
-for x in range(1):
+for x in range(5):
 	noise = rnd.normal(0,1,len(t))
 	np.savetxt("sim_data/data_{}.txt".format(x),np.transpose([t,sig+noise]),fmt=['%.5f','%.5f'])
 
