@@ -1,5 +1,7 @@
 import numpy as np
 pi = np.pi
+
+
 def log_Poisson (D,N):
 	#~ return D**N*np.exp(-D)/math.factorial(N)
 	return N*np.log(D)-D
@@ -106,3 +108,5 @@ def single_sin(t,freq1,amp1):
 	# Defining default value
 	y = amp1*np.sin(2*pi*freq1*(t)) 
 	return y
+
+
