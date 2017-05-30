@@ -52,8 +52,8 @@ def log_likelihood_v1 (t_k,N_k,*par):
 def double_sin(t,freq1,freq2,amp1=None,amp2=None):
 	"""
 	
-	Function to generate a damped sinusoidal signal for any time 't' with supplied 
-	frequency and damping timescale. 
+	Function to generate a sinusoidal signal with two frequencies for any time 't' with supplied 
+	frequencies. 
 	
 		
 	Input 
@@ -76,7 +76,7 @@ def double_sin(t,freq1,freq2,amp1=None,amp2=None):
 	
 	# Defining default value
 	if amp1==None: amp1=1
-	if amp2==None: amp2=0.5
+	if amp2==None: amp2=1
 	y = amp1*np.sin(2*pi*freq1*(t)) + amp2*np.sin(2*pi*freq2*(t))
 	return y
 
