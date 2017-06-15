@@ -82,7 +82,7 @@ def double_sin(t,freq1,freq2,amp1=1,amp2=1):
 	y = amp1*np.sin(2*pi*freq1*(t)) + amp2*np.sin(2*pi*freq2*(t))
 	return y
 
-def single_sin(t,freq1,amp1):
+def single_sin(t,freq1,amp1=1):
 	"""
 	
 	Function to generate a damped sinusoidal signal for any time 't' with supplied 
@@ -108,5 +108,7 @@ def single_sin(t,freq1,amp1):
 	# Defining default value
 	y = amp1*np.sin(2*pi*freq1*(t)) 
 	return y
+
+
 
 
