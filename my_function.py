@@ -142,7 +142,6 @@ def mcmc_1d(t,samp,init_guess = 2000,iter_number = 1e4,step = 100, multi_thres =
 	accept_list = []
 	step_list = []
 
-
 	for i in range(int(iter_number)):
 		h_current = single_sin(t,current_guess)
 		hf_current = np.fft.rfft(h_current)
