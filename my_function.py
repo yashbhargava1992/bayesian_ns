@@ -110,5 +110,69 @@ def single_sin(t,freq1,amp1=1):
 	return y
 
 
+def mcmc_1d(t,samp,current_guess = 2000,iter_number = 1e4,step = 100,multi_count = 0, multi_thres = 50,boost = 0.1):
+	
+	"""
+	sdsd
+	"""
+	dt = t[1]-t[0]
+	nyq_freq = 0.5/dt
+	xf = np.linspace (0,nyq_freq,len(t)/2)
+	df = xf[1]-xf[0]
+	sf = np.fft.rfft(samp)
+	
+
+	# List of parameters saved in loop
+	guess_list = []
+	accept_list = []
+	step_list = []
+
+
+	for i in range(int(iter_number)):
+		h_current = single_sin(t,current_guess)
+		hf_current = np.fft.rfft(h_current)
+		sh_current = 0.5*( sf*np.conjugate(hf_current)+ hf_current*np.conjugate(sf)-hf_current*np.conjugate(hf_current))
+		ll_current = np.real(np.sum(sh_current)*df)
+	
+		new_guess = np.random.normal(current_guess,step)
+		#while new_freq_guess<0: new_freq_guess = rnd.normal(current_freq_guess,freq_step)
+		h_new = single_sin(t,new_guess)
+		hf_new = np.fft.rfft(h_new)
+		sh_new = 0.5*( sf*np.conjugate(hf_new)+ hf_new*np.conjugate(sf)-hf_new*np.conjugate(hf_new))
+		ll_new = np.real(np.sum(sh_new)*df)
+	
+		ll_diff = ll_new-ll_current
+		if ll_diff<0: p_accept = np.exp(ll_diff)
+		else:p_accept = 1
+		accept = np.random.rand()<p_accept
+	
+		# alternate condition
+	#	p_accept = (ll_diff)
+	#	accept = p_accept>=0
+	
+		if accept:
+			current_guess = new_guess
+			multi_count = 0
+			step *= (1-2*boost)
+		else :
+			multi_count +=1
+		if multi_count==multi_thres and step<=0.5*np.max(guess_list): 
+			step *= 1+boost
+			multi_count=0
+		elif multi_count==multi_thres and step>0.5*np.max(guess_list): 
+			step = 10
+			multi_count=0
+	
+		guess_list.append(current_guess)
+		accept_list.append(ll_diff)
+		step_list.append(step)
+	
+	return guess_list,step_list
+
+	
+	
+	
+	
+
 
 
