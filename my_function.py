@@ -110,10 +110,24 @@ def single_sin(t,freq1,amp1=1):
 	return y
 
 
-def mcmc_1d(t,samp,current_guess = 2000,iter_number = 1e4,step = 100,multi_count = 0, multi_thres = 50,boost = 0.1):
+def mcmc_1d(t,samp,init_guess = 2000,iter_number = 1e4,step = 100, multi_thres = 50,boost = 0.1):
 	
 	"""
-	sdsd
+	Input
+	--------------
+	t				: X axis of the data
+	samp			: Y axis of the data
+	init_guess 		: Initial guess of frequency (Default value=2000)
+	iter_number 	: Number of sampling to be done (Default value = 1e4)
+	step 			: Width of the gaussian around the guess (Default value = 100)
+	multi_thres 	: Number of allowed steps to be fixed at the same value (Default value = 50)
+	boost 			: The fraction by which the step is modified if multi_thres is reached (Default value = 0.1)
+	
+	Output 
+	--------------
+	guess_list		: GUesses of the frequency (len of this array is iter_number)
+	step_list		: List of the steps throughout the sampling
+	
 	"""
 	dt = t[1]-t[0]
 	nyq_freq = 0.5/dt
@@ -121,7 +135,8 @@ def mcmc_1d(t,samp,current_guess = 2000,iter_number = 1e4,step = 100,multi_count
 	df = xf[1]-xf[0]
 	sf = np.fft.rfft(samp)
 	
-
+	current_guess = init_guess
+	multi_count = 0
 	# List of parameters saved in loop
 	guess_list = []
 	accept_list = []
