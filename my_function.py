@@ -109,6 +109,30 @@ def single_sin(t,freq1,amp1=1):
 	y = amp1*np.sin(2*pi*freq1*(t)) 
 	return y
 
+def prior_info (theta):
+	if theta > 0: return 0
+	return -np.inf
+
+
+def likelihood_estimator (sf,h,df):
+	"""
+	Input 
+	---------------
+	s				: FFT of  signal 
+	h				: Modelled signal
+	df 				: Minimum frequency diff in FFT
+	
+	Output
+	---------------
+	ll				: Log likehood of the signal being modelled correctly and noise being gaussian
+	
+	"""
+	hf = np.fft.rfft(h)
+	sh = 0.5*( sf*np.conjugate(hf)+ hf*np.conjugate(sf)-hf*np.conjugate(hf))
+	ll = np.real(np.sum(sh)*df)
+	
+	return ll
+
 
 def mcmc_1d(t,samp,init_guess = 2000,iter_number = 1e4,step = 100, multi_thres = 50,boost = 0.1):
 	
@@ -125,7 +149,7 @@ def mcmc_1d(t,samp,init_guess = 2000,iter_number = 1e4,step = 100, multi_thres =
 	
 	Output 
 	--------------
-	guess_list		: GUesses of the frequency (len of this array is iter_number)
+	guess_list		: Guesses of the frequency (len of this array is iter_number)
 	step_list		: List of the steps throughout the sampling
 	
 	"""
@@ -137,6 +161,8 @@ def mcmc_1d(t,samp,init_guess = 2000,iter_number = 1e4,step = 100, multi_thres =
 	
 	current_guess = init_guess
 	multi_count = 0
+	
+	
 	# List of parameters saved in loop
 	guess_list = []
 	accept_list = []
@@ -144,16 +170,13 @@ def mcmc_1d(t,samp,init_guess = 2000,iter_number = 1e4,step = 100, multi_thres =
 
 	for i in range(int(iter_number)):
 		h_current = single_sin(t,current_guess)
-		hf_current = np.fft.rfft(h_current)
-		sh_current = 0.5*( sf*np.conjugate(hf_current)+ hf_current*np.conjugate(sf)-hf_current*np.conjugate(hf_current))
-		ll_current = np.real(np.sum(sh_current)*df)
+		ll_current = prior_(h_current)+likelihood_estimator(sf,h_current,df)
 	
 		new_guess = np.random.normal(current_guess,step)
 		#while new_freq_guess<0: new_freq_guess = rnd.normal(current_freq_guess,freq_step)
 		h_new = single_sin(t,new_guess)
-		hf_new = np.fft.rfft(h_new)
-		sh_new = 0.5*( sf*np.conjugate(hf_new)+ hf_new*np.conjugate(sf)-hf_new*np.conjugate(hf_new))
-		ll_new = np.real(np.sum(sh_new)*df)
+		ll_new = prior_(h_new)+likelihood_estimator(sf,h_new,df)
+
 	
 		ll_diff = ll_new-ll_current
 		if ll_diff<0: p_accept = np.exp(ll_diff)
