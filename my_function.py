@@ -162,7 +162,7 @@ def mcmc_1d(t,samp,init_guess = 2000,iter_number = 1e4,step = 100, multi_thres =
 	current_guess = init_guess
 	multi_count = 0
 	
-	
+	init_step = step
 	# List of parameters saved in loop
 	guess_list = []
 	accept_list = []
@@ -170,12 +170,12 @@ def mcmc_1d(t,samp,init_guess = 2000,iter_number = 1e4,step = 100, multi_thres =
 
 	for i in range(int(iter_number)):
 		h_current = single_sin(t,current_guess)
-		ll_current = prior_(h_current)+likelihood_estimator(sf,h_current,df)
+		ll_current = prior_info(current_guess)+likelihood_estimator(sf,h_current,df)
 	
 		new_guess = np.random.normal(current_guess,step)
 		#while new_freq_guess<0: new_freq_guess = rnd.normal(current_freq_guess,freq_step)
 		h_new = single_sin(t,new_guess)
-		ll_new = prior_(h_new)+likelihood_estimator(sf,h_new,df)
+		ll_new = prior_info(new_guess)+likelihood_estimator(sf,h_new,df)
 
 	
 		ll_diff = ll_new-ll_current
@@ -189,16 +189,16 @@ def mcmc_1d(t,samp,init_guess = 2000,iter_number = 1e4,step = 100, multi_thres =
 	
 		if accept:
 			current_guess = new_guess
-			multi_count = 0
-			step *= (1-2*boost)
-		else :
-			multi_count +=1
-		if multi_count==multi_thres and step<=0.5*np.max(guess_list): 
-			step *= 1+boost
-			multi_count=0
-		elif multi_count==multi_thres and step>0.5*np.max(guess_list): 
-			step = 10
-			multi_count=0
+#			multi_count = 0
+#			step *= (1-2*boost)
+#		else :
+#			multi_count +=1
+#		if multi_count==multi_thres and step<=0.5*np.max(guess_list): 
+#			step *= 1+boost
+#			multi_count=0
+#		elif multi_count==multi_thres and step>0.5*np.max(guess_list): 
+#			step = init_step
+#			multi_count=0
 	
 		guess_list.append(current_guess)
 		accept_list.append(ll_diff)
