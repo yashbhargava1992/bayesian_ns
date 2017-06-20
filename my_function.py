@@ -189,16 +189,16 @@ def mcmc_1d(t,samp,init_guess = 2000,iter_number = 1e4,step = 100, multi_thres =
 	
 		if accept:
 			current_guess = new_guess
-#			multi_count = 0
-#			step *= (1-2*boost)
-#		else :
-#			multi_count +=1
-#		if multi_count==multi_thres and step<=0.5*np.max(guess_list): 
-#			step *= 1+boost
-#			multi_count=0
-#		elif multi_count==multi_thres and step>0.5*np.max(guess_list): 
-#			step = init_step
-#			multi_count=0
+#~ 			multi_count = 0
+#~ 			step *= (1-2*boost)
+#~ 		else :
+#~ 			multi_count +=1
+#~ 		if multi_count==multi_thres and step<=0.5*np.max(guess_list): 
+#~ 			step *= 1+boost
+#~ 			multi_count=0
+#~ 		elif multi_count==multi_thres and step>0.5*np.max(guess_list): 
+#~ 			step = init_step
+#~ 			multi_count=0
 	
 		guess_list.append(current_guess)
 		accept_list.append(ll_diff)
