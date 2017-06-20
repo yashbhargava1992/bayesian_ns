@@ -5,7 +5,7 @@ import my_function as mf
 import argparse 
 
 pr = argparse.ArgumentParser()
-pr.add_argument("-g","--guess",type=float,default=500)
+pr.add_argument("guess",type=float,default=500)
 pr.add_argument("-i","--iter",type =int, default = 10000)
 pr.add_argument("-w","--width",type= float,default = 100)
 args = pr.parse_args()
