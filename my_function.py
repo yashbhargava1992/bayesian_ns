@@ -110,6 +110,7 @@ def single_sin(t,freq1,amp1=1):
 	return y
 
 def prior_info (theta):
+	
 	if theta > 0: return 0
 	return -np.inf
 
@@ -132,6 +133,26 @@ def likelihood_estimator (sf,h,df):
 	ll = np.real(np.sum(sh)*df)
 	
 	return ll
+
+def lnlike (theta,t,s):
+	dt 	= t[1]-t[0]
+	nyq_freq = 0.5/dt
+	xf 	= np.linspace (0,nyq_freq,len(t)/2)
+	df 	= xf[1]-xf[0]
+	sf 	= np.fft.rfft(s)
+	h 	= single_sin(t,theta)
+	hf 	= np.fft.rfft(h)
+	sh 	= 0.5*( sf*np.conjugate(hf)+ hf*np.conjugate(sf)-hf*np.conjugate(hf))
+	ll 	= np.real(np.sum(sh)*df)
+	return ll
+	
+
+
+def lnprob (theta,t,s):
+	ll = lnlike(theta,t,s)
+	lp = prior_info(theta)
+	if not np.isfinite(lp): return -np.inf
+	return lp + ll
 
 
 def mcmc_1d(t,samp,init_guess = 2000,iter_number = 1e4,step = 100, multi_thres = 50,boost = 0.1):
