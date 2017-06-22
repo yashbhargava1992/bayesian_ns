@@ -109,50 +109,10 @@ def single_sin(t,freq1,amp1=1):
 	y = amp1*np.sin(2*pi*freq1*(t)) 
 	return y
 
-def prior_info (theta):
+def prior_info_v1 (theta):
 	
 	if theta > 0: return 0
 	return -np.inf
-
-
-def likelihood_estimator (sf,h,df):
-	"""
-	Input 
-	---------------
-	s				: FFT of  signal 
-	h				: Modelled signal
-	df 				: Minimum frequency diff in FFT
-	
-	Output
-	---------------
-	ll				: Log likehood of the signal being modelled correctly and noise being gaussian
-	
-	"""
-	hf = np.fft.rfft(h)
-	sh = 0.5*( sf*np.conjugate(hf)+ hf*np.conjugate(sf)-hf*np.conjugate(hf))
-	ll = np.real(np.sum(sh)*df)
-	
-	return ll
-
-def lnlike (theta,t,s):
-	dt 	= t[1]-t[0]
-	nyq_freq = 0.5/dt
-	xf 	= np.linspace (0,nyq_freq,len(t)/2)
-	df 	= xf[1]-xf[0]
-	sf 	= np.fft.rfft(s)
-	h 	= single_sin(t,theta)
-	hf 	= np.fft.rfft(h)
-	sh 	= 0.5*( sf*np.conjugate(hf)+ hf*np.conjugate(sf)-hf*np.conjugate(hf))
-	ll 	= np.real(np.sum(sh)*df)
-	return ll
-	
-
-
-def lnprob (theta,t,s):
-	ll = lnlike(theta,t,s)
-	lp = prior_info(theta)
-	if not np.isfinite(lp): return -np.inf
-	return lp + ll
 
 
 def mcmc_1d(t,samp,init_guess = 2000,iter_number = 1e4,step = 100, multi_thres = 50,boost = 0.1):
@@ -191,12 +151,12 @@ def mcmc_1d(t,samp,init_guess = 2000,iter_number = 1e4,step = 100, multi_thres =
 
 	for i in range(int(iter_number)):
 		h_current = single_sin(t,current_guess)
-		ll_current = prior_info(current_guess)+likelihood_estimator(sf,h_current,df)
+		ll_current = prior_info_v1(current_guess)+likelihood_estimator(sf,h_current,df)
 	
 		new_guess = np.random.normal(current_guess,step)
 		#while new_freq_guess<0: new_freq_guess = rnd.normal(current_freq_guess,freq_step)
 		h_new = single_sin(t,new_guess)
-		ll_new = prior_info(new_guess)+likelihood_estimator(sf,h_new,df)
+		ll_new = prior_info_v1(new_guess)+likelihood_estimator(sf,h_new,df)
 
 	
 		ll_diff = ll_new-ll_current
@@ -228,6 +188,67 @@ def mcmc_1d(t,samp,init_guess = 2000,iter_number = 1e4,step = 100, multi_thres =
 	return guess_list,step_list
 
 	
+
+
+
+def likelihood_estimator (sf,h,df):
+	"""
+	Input 
+	---------------
+	s				: FFT of  signal 
+	h				: Modelled signal
+	df 				: Minimum frequency diff in FFT
+	
+	Output
+	---------------
+	ll				: Log likehood of the signal being modelled correctly and noise being gaussian
+	
+	"""
+	hf = np.fft.rfft(h)
+	sh = 0.5*( sf*np.conjugate(hf)+ hf*np.conjugate(sf)-hf*np.conjugate(hf))
+	ll = np.real(np.sum(sh)*df)
+	
+	return ll
+
+def lnlike_v1 (theta,t,s):
+	dt 	= t[1]-t[0]
+	nyq_freq = 0.5/dt
+	xf 	= np.linspace (0,nyq_freq,len(t)/2)
+	df 	= xf[1]-xf[0]
+	sf 	= np.fft.rfft(s)
+	h 	= single_sin(t,theta)
+	hf 	= np.fft.rfft(h)
+	sh 	= 0.5*( sf*np.conjugate(hf)+ hf*np.conjugate(sf)-hf*np.conjugate(hf))
+	ll 	= np.real(np.sum(sh)*df)
+	return ll
+	
+
+def prior_info_2d (theta):
+	freq,tau = theta
+	if freq > 0 and tau > 0: return 0
+	return -np.inf
+
+def lnlike_2d (theta,t,s):
+	freq,tau = theta
+	dt 	= t[1]-t[0]
+	nyq_freq = 0.5/dt
+	xf 	= np.linspace (0,nyq_freq,len(t)/2)
+	df 	= xf[1]-xf[0]
+	sf 	= np.fft.rfft(s)
+	h 	= damped_sin(t,tau,freq)
+	hf 	= np.fft.rfft(h)
+	sh 	= 0.5*( sf*np.conjugate(hf)+ hf*np.conjugate(sf)-hf*np.conjugate(hf))
+	ll 	= np.real(np.sum(sh)*df)
+	return ll
+
+def lnprob (theta,t,s):
+	ll = lnlike_2d(theta,t,s)
+	lp = prior_info_2d(theta)
+	if not np.isfinite(lp): return -np.inf
+	return lp + ll
+
+
+
 	
 	
 	
