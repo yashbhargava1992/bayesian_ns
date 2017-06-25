@@ -48,7 +48,7 @@ np.savetxt("test_data_Jun25.txt",np.transpose([t,samp]),fmt=['%.5f','%.5f'],head
 
 pos = [[fre_guess,tau_guess,amp_guess] + [fre_wid,tau_wid,amp_wid]*rnd.randn(ndim) for i in range (nwalkers)]
 
-sampler = mc.EnsembleSampler(nwalkers,ndim,mf.lnprob,args = (t,samp,mf.damped_sin),threads=8)
+sampler = mc.EnsembleSampler(nwalkers,ndim,mf.lnprob,args = (t,samp,mf.damped_sin),threads=4)
 sampler.run_mcmc(pos, args.iter)
 current_time1 = time.time()
 print "EMCEE done, time required:\t", current_time1-current_time
