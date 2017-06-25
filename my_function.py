@@ -231,7 +231,7 @@ def prior_info_dd (theta):
 
 	elif len(theta)==3 : 
 		freq,tau,amp = theta
-		if freq > 0 and tau > 0 and amp > 0: 
+		if freq > 0 and tau > 1e-10 and tau < 6 and amp > 1e-10 and amp < 4: 
 			return 0
 	return -np.inf
 
