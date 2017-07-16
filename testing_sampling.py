@@ -5,6 +5,10 @@ import my_function as mf
 import argparse 
 import emcee as mc
 import time
+from matplotlib import rc
+
+rc('text',usetex=True)
+rc('font',**{'family':'serif','serif':['Computer Modern'],'size':15} )
 
 pr = argparse.ArgumentParser()
 pr.add_argument("guess",type=float,default=500)
@@ -38,8 +42,8 @@ wid = args.width
 
 pos = [args.guess + wid*rnd.randn(ndim) for i in range (nwalkers)]
 
-sampler = mc.EnsembleSampler(nwalkers,ndim,mf.lnprob,args = (t,samp))
-sampler.run_mcmc(pos, args.iter)
+sampler = mc.EnsembleSampler(nwalkers,ndim,mf.lnprob,args = (t,samp,mf.single_sin),threads=4)
+sampler.run_mcmc(pos, args.iter/10)
 current_time1 = time.time()
 
 print "EMCEE done, time required:\t", current_time1-current_time
@@ -49,14 +53,17 @@ print "EMCEE done, time required:\t", current_time1-current_time
 print max(guess_list), min(guess_list)
 #print max(accept_list), min(accept_list)
 print max(freq_step_list), min(freq_step_list)
-ax1 = plt.subplot(411)
-ax2 = plt.subplot(412)
-ax3 = plt.subplot(413)
-ax4 = plt.subplot(414)
-ax1.plot(freq_step_list	)
-ax2.plot(guess_list)
-ax3.hist(guess_list,1000)
-ax4.hist(sampler.chain[:, 50:, :].reshape((-1, ndim)),1000)
+ax2 = plt.subplot(212)
+ax1 = plt.subplot(211,sharex=ax2)
+#~ ax3 = plt.subplot(413)
+#~ ax4 = plt.subplot(414)
+#~ ax1.plot(freq_step_list	)
+#~ ax2.plot(guess_list)
+ax1.hist(guess_list,100)
+ax2.hist(sampler.chain[:, 50:, :].reshape((-1, ndim)),100)
+ax1.set_ylabel('Basic sampling')
+ax2.set_ylabel('$emcee$ sampling')
+ax2.set_xlabel('frequency')
 plt.savefig("mcmc_test.png")
 plt.show()
 
