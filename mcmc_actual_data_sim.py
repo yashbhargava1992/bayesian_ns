@@ -7,7 +7,7 @@ import my_function as mf
 import argparse 
 import emcee as mc
 import time
-import corner_local as cr
+import corner_orig as cr
 
 
 
@@ -22,33 +22,41 @@ start_time = time.time()
 #~ t = data[0]
 #~ s = data[1]
 
-date_append = "Jul04"
+date_append = "high_amp_gnh_Jul15"
 
-t = np.linspace(0,0.5, 100000)
+t = np.linspace(0,0.5, 10000)
 
-seed_freq 	= 2300
+#seed_freq 	= 2.42e3
+#seed_tau 	= 0.01037
+#seed_amp 	= 5
+#seed_gamma	= -3467
+#seed_xi		= 2e4
+
+seed_freq 	= 2.3e3
 seed_tau 	= 0.02345
-seed_amp 	= 1
+seed_amp 	= 10
 seed_gamma	= 38
 seed_xi		= -9e2
 
-guess = np.array([2000,0.02,1,-1000,40]) ## Format of guess is freq,tau,amp,gamma,xi
+guess = np.array([2000,0.02,8])#,-3e3,1e4]) ## Format of guess is freq,tau,amp,gamma,xi
 width = guess/10
-iters = 100
+iters = 5e3
 num_bins = 50
 
 
-sig = mf.f2_sin(t,[seed_tau,seed_freq,seed_amp,seed_gamma,seed_xi,0.1])
+sig = mf.f2_sin(t,[seed_freq,seed_tau,seed_amp,seed_gamma,seed_xi])
 noise = rnd.normal(0,1,len(t))
 samp = sig+noise
-#~ print sig
+#print t
+#print sig
+print np.mean(noise), np.std(noise)
 #~ print np.shape(sig)
 
 ax1 = plt.subplot(211)
-ax1.plot(t,sig,'-')
+ax1.plot(t,sig,'.')
 ax2 = plt.subplot(212)
-ax2.plot(t,samp,'-')
-#~ plt.show()
+ax2.plot(t,samp,'.')
+plt.show()
 plt.clf()
 
 
@@ -59,7 +67,7 @@ xf = np.linspace (0,nyq_freq,len(t)/2)
 df = xf[1]-xf[0]
 
 current_time = time.time()
-ndim,nwalkers = 5,100
+ndim,nwalkers = 3,100
 
 
 
@@ -108,9 +116,9 @@ plt.clf()
 
 samples = sampler.chain[:, 50:, :].reshape((-1, ndim))
 print "Shape of samples :\t", np.shape(samples)
-fig = cr.corner(samples, labels=["$freq$", r"$\tau$", "$A$", r"$\gamma$", r"$\xi$"],
-                      truths=[seed_freq, seed_tau, seed_amp, seed_gamma,seed_xi],
-                      bins = [num_bins,tau_bins,amp_bins,num_bins,num_bins],
-                      fill_contours=True,show_title=True,hist_2d_cmap=plt.get_cmap('cool'),
-                      quantiles=[0.05,0.5,0.95],verbose=True,color='r')
+fig = cr.corner(samples, labels=["$freq$", r"$\tau$", "$A$"],# r"$\gamma$", r"$\xi$"],
+                      truths=[seed_freq, seed_tau, seed_amp],# seed_gamma,seed_xi],
+                      bins = [num_bins,tau_bins,amp_bins],#num_bins,num_bins],
+                      fill_contours=True,show_title=True,#hist_2d_cmap=plt.get_cmap('cool'),
+                      quantiles=[0.05,0.95],verbose=True,color='k')
 fig.savefig("triangle_actual_data_{}.pdf".format(date_append))

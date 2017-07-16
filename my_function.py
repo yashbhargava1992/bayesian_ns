@@ -83,7 +83,7 @@ def f2_sin (t,theta):
 	
 	ind = np.where (t>=t_start)
 	y = np.zeros(len(t))
-	y[ind] = amp*np.exp(-t[ind]/tau)*np.sin(2*pi*(freq*t[ind]+gamma*t[ind]**2+xi*t[ind]**3)+pi*beta)
+	y[ind] = amp*np.exp(-(t[ind]-t_start)/tau)*np.sin(2*pi*(freq*(t[ind]-t_start)+gamma*(t[ind]-t_start)**2+xi*(t[ind]-t_start)**3)+pi*beta)
 	
 	return y
 
@@ -275,28 +275,36 @@ def lnlike_v1 (theta,t,s):
 	
 
 def prior_info_dd (theta):
+	amp_min,amp_max = 1e-5,20
+	freq_min,freq_max = 1500,3100
+	tau_min,tau_max = 1e-3,4e-2
+	gamma_min,gamma_max = -4000,500
+	xi_min,xi_max = -1000, 1e5
 	if len(theta)==2:
 		freq,tau = theta
-		if freq > 0 and tau > 0: 
+		if ((freq>freq_min and freq<freq_max) and 
+			(tau>tau_min and tau < tau_max)): 
 			return 0.0
 
 	elif len(theta)==3 : 
 		freq 	= theta[0]
 		tau 	= theta[1]
 		amp 	= theta[2]
-		if freq > 0 and tau > 1e-10 and tau < 6 and amp > 1e-10 and amp < 15: 
-			return 0.0
+		if ((freq>freq_min  and freq<freq_max) and 
+			(tau>tau_min and tau <tau_max) and 
+			(amp > amp_min and amp < amp_max)): 
+				return 0.0
 	elif len(theta)==5:
 		freq 	= theta[0]
 		tau 	= theta[1]
 		amp 	= theta[2]
 		gamma	= theta[3]
 		xi		= theta[4]
-		if ((freq>1500 and freq<3100) and 
-			(tau>1e-4 and tau < 1e-1) and
-			(gamma>-4000 and gamma<500) and
-			(xi >-1000 and xi< 1e5) and
-			(amp>1e-5 and amp<20)):
+		if ((freq>freq_min and freq<freq_max) and 
+			(tau>tau_min and tau <tau_max) and
+			(gamma>gamma_min and gamma<gamma_max) and
+			(xi >xi_min and xi<xi_max) and
+			(amp>amp_min and amp<amp_max)):
 				return 0.0
 	return -np.inf
 
