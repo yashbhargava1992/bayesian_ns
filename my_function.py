@@ -69,7 +69,8 @@ def f2_sin (t,theta):
 	y				: Signal comprising of only f2 term in  eq of h+ from Bose et al. 2017
 	
 	"""
-	freq,tau,gamma,xi,amp,beta,t_start=1000,1,38,-9e2,1,0,0
+	#freq,tau,gamma,xi,amp,beta,t_start=1000,1,38,-9e2,1,0,0 			# gnh3
+	freq,tau,gamma,xi,amp,beta,t_start=1000,1,-3467,2e4,1,0,0			# alf2
 	if len(theta)==2:
 		freq,tau = theta
 	elif len(theta)==3:
