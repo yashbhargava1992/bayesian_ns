@@ -4,10 +4,12 @@ import matplotlib.pyplot as plt
 import scipy.optimize as op
 import my_function as mf
 import numpy.random as rnd
+from matplotlib import rc
 
+rc('text',usetex=True)
+rc('font',**{'family':'serif','serif':['Computer Modern'],'size':15} )
 
-
-data = np.loadtxt("sim_data/high_amp_data_0.txt",unpack=True)
+data = np.loadtxt("sim_data/data_0.txt",unpack=True)
 t = data[0]
 s = data[1]
 #~ x0 = [t,s,0.5,1000]
@@ -22,13 +24,18 @@ df = xf[1]-xf[0]
 
 
 ###### To do: Get fourier transforms of s and h and get the likelihood
-'''
-tau = 1
-freq = 1020
-h = mf.damped_sin(t,tau,freq,40)
-
-
-sf = np.fft.rfft(s)
+''
+seed_tau = 1
+seed_freq = 1010
+h = mf.damped_sin(t,[seed_freq,seed_tau])
+s = mf.damped_sin(t,[seed_freq,seed_tau])
+noise = rnd.normal(0,1,len(t))
+samp = s+noise
+plt.plot(t,s+noise,'.',label='Signal+Noise')
+plt.plot(t,s,'-',label='Signal')
+plt.legend()
+plt.savefig('signal_realisation.png')
+sf = np.fft.rfft(samp)
 hf = np.fft.rfft(h)
 
 sh = 0.5*( sf*np.conjugate(hf)+ hf*np.conjugate(sf)-hf*np.conjugate(hf))
@@ -54,7 +61,7 @@ l_all = np.array([])			# List of likelihood as each point in parameter space is 
 
 for fr in fre_array:
 	for ta in tau_array:
-		h = mf.damped_sin(t,ta,fr,40)
+		h = mf.damped_sin(t,[fr,ta])
 		#~ sf = np.fft.rfft(s)
 		hf = np.fft.rfft(h)
 		sh = 0.5*( sf*np.conjugate(hf)+ hf*np.conjugate(sf)-hf*np.conjugate(hf))
@@ -73,18 +80,20 @@ X,Y =np.meshgrid(image[1][:-1],image[2][:-1])
 
 plt.contourf(np.transpose(X),np.transpose(Y),image[0]/im_base [0])
 plt.xscale('log')
-plt.title(r'$\tau$ vs Freq')
+#~ plt.title(r'$\tau$ vs Freq')
 plt.xlabel(r'$\tau$')
 plt.ylabel('Freq')
+plt.axvline(seed_tau , color='k')
+plt.axhline(seed_freq, color='k')
 plt.colorbar()
-plt.savefig('high_amp_tau_vs_freq.png')
+plt.savefig('med_amp_tau_vs_freq.png')
 plt.show()
 plt.clf()
-'''
+''
 
 
 ####### Testing whether likelihood method works or not
-''
+'''
 test_freq1 = 1010
 test_freq2 = 200
 sig = mf.double_sin(t,test_freq1,test_freq2)
@@ -129,7 +138,7 @@ plt.colorbar()
 plt.savefig('noiseless_far_freq_vs_freq.png')
 plt.show()
 plt.clf()
-''
+'''
 
 ######### Test 2
 

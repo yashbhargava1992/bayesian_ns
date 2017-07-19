@@ -31,7 +31,13 @@ def damped_sin(t,theta):
 	Due to ordering of arguments the case of optional amplitude and given t_start cannot be used
 		
 	"""
-	if len(theta)==2:
+	theta = np.atleast_1d(theta)
+	if len(theta)==1: 
+		freq = theta
+		tau=1
+		amp = 1
+		t_start = 0
+	elif len(theta)==2:
 		freq,tau = theta
 		amp = 1
 		t_start = 0
