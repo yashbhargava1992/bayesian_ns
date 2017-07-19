@@ -18,12 +18,12 @@ t = data[0]
 s = data[1]
 
 seed_freq =  1010
-seed_tau = 2
-seed_amp = 0.5
+seed_tau = 1
+seed_amp = 1
 
 
 
-sig = mf.damped_sin(t,seed_tau,seed_freq,seed_amp)
+sig = mf.damped_sin(t,[seed_freq,seed_tau,seed_amp])
 noise = rnd.normal(0,1,len(t))
 samp = sig+noise
 
@@ -60,18 +60,22 @@ amp_list = sampler.chain[:, 50:, 2].flatten()
 ax1 = plt.subplot(311)
 ax2 = plt.subplot(312)
 ax3 = plt.subplot(313)
-ax1.hist(freq_list,100)
+ax1.hist(freq_list,100,normed=True)
 #ax2.hist(tau_list,100)
 #ax3.hist(amp_list,100)
 tau_bins = np.logspace(-3,np.log10(max(tau_list)),100)
 amp_bins = np.logspace(-3,np.log10(max(amp_list)),100)
-ax2.hist(tau_list,tau_bins)
-ax3.hist(amp_list,amp_bins)
+ax2.hist(tau_list,tau_bins,normed=True)
+ax3.hist(amp_list,amp_bins,normed=True)
 ax1.set_ylabel("Freq hist")
 
 ax2.set_ylabel(r"$\tau$ hist")
 
 ax3.set_ylabel("Amp hist")
+
+ax1.axvline(seed_freq,color='k')
+ax2.axvline(seed_tau ,color='k')
+ax3.axvline(seed_amp ,color='k')
 
 hist_2d,x_ed,y_ed = np.histogram2d(freq_list,tau_list,bins=(100,100))
 #ax3.hist2d(freq_list,tau_list,100)
@@ -80,5 +84,5 @@ X,Y = np.meshgrid(x_ed,y_ed)
 #plt.colorbar()
 print np.shape(freq_list)
 with open ("mcmc_freq_tau_amp_list_Jun25.txt",'w') as f: np.savetxt(f,np.transpose([freq_list,tau_list,amp_list]),fmt=['%.3f','%.3f','%.3f'])
-plt.savefig("mcmc_3d_Jun25.png")
+plt.savefig("mcmc_3d_Jul19.png")
 plt.show()
