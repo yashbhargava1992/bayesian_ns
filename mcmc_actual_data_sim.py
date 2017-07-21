@@ -7,41 +7,62 @@ import my_function as mf
 import argparse 
 import emcee as mc
 import time
-import corner_orig as cr
+import corner_local as cr
 
 
 
-#~ pr = argparse.ArgumentParser()
-#~ pr.add_argument("guess",type=float,default=500)
+pr = argparse.ArgumentParser()
+pr.add_argument("append_text",default="gnh")
+
+pr.add_argument("freq",type=float,default=2.3e3)
+pr.add_argument("tau",type=float,default=23.45e-3)
+pr.add_argument("amp",type=float,default=0.5)
+
+pr.add_argument("gamma",type=float,default=38.0)
+pr.add_argument("xi",type=float,default=-9e2)
+
+pr.add_argument("dim",type=int,default=5)
+
+
 #~ pr.add_argument("-i","--iter",type =int, default = 500)
 #~ pr.add_argument("-w","--width",type= float,default = 100)
-#~ args = pr.parse_args()
+args = pr.parse_args()
 
 start_time = time.time()
 #~ data = np.loadtxt("sim_data/data_0.txt",unpack=True)
 #~ t = data[0]
 #~ s = data[1]
 
-date_append = "high_amp_gnh_Jul15"
+date_append = args.append_text
 
 t = np.linspace(0,0.5, 10000)
 
 #seed_freq 	= 2.42e3
 #seed_tau 	= 0.01037
-#seed_amp 	= 5
+#seed_amp 	= 0.5
 #seed_gamma	= -3467
 #seed_xi		= 2e4
 
-seed_freq 	= 2.3e3
-seed_tau 	= 0.02345
-seed_amp 	= 10
-seed_gamma	= 38
-seed_xi		= -9e2
-
-guess = np.array([2000,0.02,8])#,-3e3,1e4]) ## Format of guess is freq,tau,amp,gamma,xi
-width = guess/10
-iters = 5e3
+seed_freq 	= args.freq
+seed_tau 	= args.tau
+seed_amp 	= args.amp
+seed_gamma	= args.gamma
+seed_xi		= args.xi
 num_bins = 50
+if args.dim==3:
+	guess = np.array([2000,0.02,3])#,100,-1e3]) ## Format of guess is freq,tau,amp,gamma,xi
+	labels = ["$f$", r"$\tau$", "$A$"]
+	truths=[seed_freq, seed_tau, seed_amp]
+	
+	
+elif args.dim==5:
+	guess = np.array([2000,0.02,3,100,-1e3])
+	labels=["$f$", r"$\tau$", "$A$",r"$\gamma$", r"$\xi$"]
+	
+	truths=[seed_freq, seed_tau, seed_amp, seed_gamma,seed_xi]
+width = guess/10
+iters = 1e3
+
 
 
 sig = mf.f2_sin(t,[seed_freq,seed_tau,seed_amp,seed_gamma,seed_xi])
@@ -56,7 +77,7 @@ ax1 = plt.subplot(211)
 ax1.plot(t,sig,'.')
 ax2 = plt.subplot(212)
 ax2.plot(t,samp,'.')
-plt.show()
+#plt.show()
 plt.clf()
 
 
@@ -67,7 +88,7 @@ xf = np.linspace (0,nyq_freq,len(t)/2)
 df = xf[1]-xf[0]
 
 current_time = time.time()
-ndim,nwalkers = 3,100
+ndim,nwalkers = args.dim,100
 
 
 
@@ -114,11 +135,19 @@ plt.savefig("mcmc_3d_{}.png".format(date_append))
 plt.clf()
 
 
+
+
 samples = sampler.chain[:, 50:, :].reshape((-1, ndim))
 print "Shape of samples :\t", np.shape(samples)
-fig = cr.corner(samples, labels=["$freq$", r"$\tau$", "$A$"],# r"$\gamma$", r"$\xi$"],
-                      truths=[seed_freq, seed_tau, seed_amp],# seed_gamma,seed_xi],
-                      bins = [num_bins,tau_bins,amp_bins],#num_bins,num_bins],
-                      fill_contours=True,show_title=True,#hist_2d_cmap=plt.get_cmap('cool'),
-                      quantiles=[0.05,0.95],verbose=True,color='k')
+
+
+if args.dim==3:bins = [num_bins,tau_bins,amp_bins]
+elif args.dim==5:bins = [num_bins,tau_bins,amp_bins,num_bins,num_bins]
+
+
+fig = cr.corner(samples, labels=labels,
+                      truths=truths,
+                      bins = bins,
+                      fill_contours=True,show_titles=True,#hist_2d_cmap=plt.get_cmap('cool'),
+                      quantiles=[0.16,0.84],verbose=True,color='k')
 fig.savefig("triangle_actual_data_{}.pdf".format(date_append))
