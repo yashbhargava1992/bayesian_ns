@@ -94,6 +94,13 @@ def f2_sin (t,theta):
 	
 	return y
 
+def f1_sin (t,theta):
+	freq,tau=theta
+	f_eps=50
+	y = np.exp(-t/tau)*(np.sin(2*pi* freq*t)+np.sin(2*pi *(freq-f_eps)*t) + np.sin(2*pi* (freq+f_eps)*t))
+	return y
+	
+
 
 def double_sin(t,freq1,freq2,amp1=1,amp2=1):
 	"""
