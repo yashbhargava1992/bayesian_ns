@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function, absolute_import
+from __future__ import print_function, absolute_import, division
 
 import logging
 import numpy as np
@@ -8,6 +8,10 @@ import matplotlib.pyplot as pl
 from matplotlib.ticker import MaxNLocator, NullLocator
 from matplotlib.colors import LinearSegmentedColormap, colorConverter
 from matplotlib.ticker import ScalarFormatter
+from matplotlib import rc
+
+rc('text',usetex=True)
+rc('font',**{'family':'serif','serif':['Computer Modern'],'size':15} )
 
 try:
     from scipy.ndimage import gaussian_filter
@@ -23,9 +27,8 @@ def corner(xs, bins=20, range=None, weights=None, color="k",
            show_titles=False, title_fmt=".2f", title_kwargs=None,
            truths=None, truth_color="#4682b4",
            scale_hist=False, quantiles=None, verbose=False, fig=None,
-           max_n_ticks=5, top_ticks=False, use_math_text=False, reverse=False,hist_2d_cmap = pl.get_cmap('jet'),
-           hist_kwargs=None,
-            **hist2d_kwargs):
+           max_n_ticks=5, top_ticks=False, use_math_text=False, reverse=False,
+           hist_kwargs=None, **hist2d_kwargs):
     """
     Make a *sick* corner plot showing the projections of a data set in a
     multi-dimensional space. kwargs are passed to hist2d() or used for
@@ -225,8 +228,9 @@ def corner(xs, bins=20, range=None, weights=None, color="k",
                 ax = axes[i, i]
         # Plot the histograms.
         if smooth1d is None:
-            n, _, _ = ax.hist(x, bins=bins[i], weights=weights,
-                              range=np.sort(range[i]), **hist_kwargs)
+            n, _, _ = ax.hist(x, bins=bins[i], weights=np.ones(len(x))/float(len(x)),#weights,
+                              range=np.sort(range[i]),#normed=True, 
+                              **hist_kwargs)
         else:
             if gaussian_filter is None:
                 raise ImportError("Please install scipy for smoothing")
@@ -263,10 +267,11 @@ def corner(xs, bins=20, range=None, weights=None, color="k",
                 fmt = "{{0:{0}}}".format(title_fmt).format
                 title = r"${{{0}}}_{{-{1}}}^{{+{2}}}$"
                 title = title.format(fmt(q_50), fmt(q_m), fmt(q_p))
-
+                print (title)
                 # Add in the column name if it's given.
                 if labels is not None:
                     title = "{0} = {1}".format(labels[i], title)
+                   # print title
 
             elif labels is not None:
                 title = "{0}".format(labels[i])
@@ -284,13 +289,20 @@ def corner(xs, bins=20, range=None, weights=None, color="k",
             ax.set_ylim(-0.1 * maxn, 1.1 * maxn)
         else:
             ax.set_ylim(0, 1.1 * np.max(n))
-        ax.set_yticklabels([])
+        #ax.set_yticklabels([])
+        #ax.tick_params(axis='y', which='both', labelleft='off', labelright='on')
+        ax.yaxis.tick_right()
+        ax.ticklabel_format(axis='y',style='sci',scilimits=(-2,2))
+        #ax.get_yaxis().get_offset_text().set_position((1.05,1))
+        
+        
+        
         if max_n_ticks == 0:
             ax.xaxis.set_major_locator(NullLocator())
             ax.yaxis.set_major_locator(NullLocator())
         else:
             ax.xaxis.set_major_locator(MaxNLocator(max_n_ticks, prune="lower"))
-            ax.yaxis.set_major_locator(NullLocator())
+            #ax.yaxis.set_major_locator(NullLocator())
 
         if i < K - 1:
             if top_ticks:
@@ -333,7 +345,7 @@ def corner(xs, bins=20, range=None, weights=None, color="k",
                 y = y.compressed()
 
             hist2d(y, x, ax=ax, range=[range[j], range[i]], weights=weights,
-                   color=color, smooth=smooth, bins=[bins[j], bins[i]], hist_2d_cmap=hist_2d_cmap,
+                   color=color, smooth=smooth, bins=[bins[j], bins[i]],
                    **hist2d_kwargs)
 
             if truths is not None:
@@ -441,7 +453,7 @@ def hist2d(x, y, bins=20, range=None, weights=None, levels=None, smooth=None,
            ax=None, color=None, plot_datapoints=True, plot_density=True,
            plot_contours=True, no_fill_contours=False, fill_contours=False,
            contour_kwargs=None, contourf_kwargs=None, data_kwargs=None,
-           hist_2d_cmap=pl.get_cmap("jet"),**kwargs):
+           **kwargs):
     """
     Plot a 2-D histogram of samples.
     Parameters
@@ -583,13 +595,12 @@ def hist2d(x, y, bins=20, range=None, weights=None, levels=None, smooth=None,
     # Plot the base fill to hide the densest data points.
     if (plot_contours or plot_density) and not no_fill_contours:
         ax.contourf(X2, Y2, H2.T, [V.min(), H.max()],
-                    cmap=hist_2d_cmap, antialiased=False)
-                    #~ cmap=white_cmap, antialiased=False)
+                    cmap=white_cmap, antialiased=False)
 
     if plot_contours and fill_contours:
         if contourf_kwargs is None:
             contourf_kwargs = dict()
-        contourf_kwargs["colors"] = contourf_kwargs.get("colors", hist_2d_cmap)
+        contourf_kwargs["colors"] = contourf_kwargs.get("colors", contour_cmap)
         contourf_kwargs["antialiased"] = contourf_kwargs.get("antialiased",
                                                              False)
         ax.contourf(X2, Y2, H2.T, np.concatenate([[0], V, [H.max()*(1+1e-4)]]),
@@ -604,8 +615,8 @@ def hist2d(x, y, bins=20, range=None, weights=None, levels=None, smooth=None,
     if plot_contours:
         if contour_kwargs is None:
             contour_kwargs = dict()
-        contour_kwargs["colors"] = contour_kwargs.get("colors", hist_2d_cmap)
+        contour_kwargs["colors"] = contour_kwargs.get("colors", color)
         ax.contour(X2, Y2, H2.T, V, **contour_kwargs)
-	ax.set_xlim(range[0])
-	ax.set_ylim(range[1])
-	return
+
+    ax.set_xlim(range[0])
+    ax.set_ylim(range[1])
