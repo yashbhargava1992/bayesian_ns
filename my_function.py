@@ -1,7 +1,15 @@
+## Function file written for MCMC sampling for the Bayesian parameter estimation of 
+# post-merger gravitational wave signal of the merger of 2 Neutron stars
+
+### Author: 		Yash Bhargava, IUCAA 
+### Last updated: 	September 18, 2017
+
+
 import numpy as np
 pi = np.pi
 
-	
+############ Functions corresponding to type of signal
+
 def damped_sin(t,theta):
 	"""
 	
@@ -16,15 +24,11 @@ def damped_sin(t,theta):
 		tau				: Damping timescale of signal (in sec)
 		freq    		: Frequency of oscillation (in Hz)
 		amp				: (Optional) Amplitude of signal. Default value 1
-		t_start			: (Optional) Time stamp of when the signal begins. Default value 0
-	
+		
 	Output
 	----------------
 	y				: Required signal
 	
-	Note
-	----------------
-	Due to ordering of arguments the case of optional amplitude and given t_start cannot be used
 		
 	"""
 	theta = np.atleast_1d(theta)
@@ -32,25 +36,19 @@ def damped_sin(t,theta):
 		freq = theta
 		tau=1
 		amp = 1
-		t_start = 0
+		
 	elif len(theta)==2:
 		freq,tau = theta
 		amp = 1
-		t_start = 0
+		
 	elif len(theta)==3:
 		freq,tau,amp = theta
-		t_start = 0
-	else: freq,tau,amp,t_start = theta
-	# Defining default value
-	#if amp==None: amp=1
-	#if t_start==None: t_start=0
-	ind = np.where (t>=t_start)
-	y = np.zeros(len(t))
-	y[ind] = amp*np.exp(-(t[ind]-t_start)/tau)*np.sin(2*pi*freq*(t[ind]-t_start))
+		
+	
+	y= amp*np.exp(-(t)/tau)*np.sin(2*pi*freq*(t))
 	return y
 
 def f2_sin (t,theta):
-#~ tau,freq,gamma=38,xi=-9e2,amp=1,beta=0,t_start=0):
 	"""
 	
 	Parameters
@@ -63,30 +61,24 @@ def f2_sin (t,theta):
 		gamma           : Coefficient of t^2 term inside the sin (Default value=38 for GNH3)
 		xi				: Coefficient of t^3 term inside the sin (Default value=-9e2 for GNH3)
 		beta			: Phase term inside the sin (Default value=0)
-		t_start			: Start point of signal as compared to start of time series (Default value=0, assumes t_start>=t[0])
-	
-	
+			
 	Returns
 	-----------------
 	y				: Signal comprising of only f2 term in  eq of h+ from Bose et al. 2017
 	
 	"""
-	#freq,tau,gamma,xi,amp,beta,t_start=1000,1,38,-9e2,3,0,0 			# gnh3
-	freq,tau,gamma,xi,amp,beta,t_start=1000,1,-3467,2e4,10,0,0			# alf2
+	#freq,tau,gamma,xi,amp,beta=1000,1,38,-9e2,3,0			# gnh3
+	freq,tau,gamma,xi,amp,beta=1000,1,-3467,2e4,0.5,0			# alf2
 	if len(theta)==2:
 		freq,tau = theta
 	elif len(theta)==3:
 		freq,tau,amp = theta
 	elif len(theta)==5:
 		freq,tau,amp,gamma,xi = theta 
-	elif len(theta)==6:
-		freq,tau,amp,gamma,xi,t_start = theta 
-		print freq,tau,amp,gamma,xi,t_start 
 	
 	
-	ind = np.where (t>=t_start)
-	y = np.zeros(len(t))
-	y[ind] = amp*np.exp(-(t[ind]-t_start)/tau)*np.sin(2*pi*(freq*(t[ind]-t_start)+gamma*(t[ind]-t_start)**2+xi*(t[ind]-t_start)**3)+pi*beta)
+	
+	y = amp*np.exp(-(t)/tau)*np.sin(2*pi*(freq*(t)+gamma*(t)**2+xi*(t)**3)+pi*beta)
 	
 	return y
 
@@ -146,10 +138,7 @@ def single_sin(t,theta):
 	----------------
 	y				: Required signal
 	
-	Note
-	----------------
-	Due to ordering of arguments the case of optional amplitude and given t_start cannot be used
-		
+			
 	"""
 	theta = np.atleast_1d(theta)
 	freq,amp = 1000,1
@@ -160,6 +149,7 @@ def single_sin(t,theta):
 	return y
 
 
+<<<<<<< HEAD
 def mcmc_1d(t,samp,init_guess = 2000,iter_number = 1e4,step = 100, multi_thres = 50,boost = 0.1):
 	
 	"""
@@ -267,6 +257,9 @@ def lnlike_v1 (theta,t,s):
 	ll 	= np.real(np.sum(sh)*df)
 	return ll
 	
+=======
+######### The functions for the bayesian analysis
+>>>>>>> c1b1844ff9e175cc6b3d951b884904a12fc8b99d
 
 def prior_info_dd (theta):
 	amp_min,amp_max = 1e-5,20
