@@ -19,16 +19,16 @@ import corner_local as cr
 
 
 pr = argparse.ArgumentParser()
-pr.add_argument("append_text",default="gnh")
+pr.add_argument("--append_text",default="gnh")
 
-pr.add_argument("freq",type=float,default=2.3e3)
-pr.add_argument("tau",type=float,default=23.45e-3)
-pr.add_argument("amp",type=float,default=0.5)
+pr.add_argument("--freq",type=float,default=2.3e3)
+pr.add_argument("--tau",type=float,default=23.45e-3)
+pr.add_argument("--amp",type=float,default=0.5)
 
-pr.add_argument("gamma",type=float,default=38.0)
-pr.add_argument("xi",type=float,default=-9e2)
+pr.add_argument("--gamma",type=float,default=38.0)
+pr.add_argument("--xi",type=float,default=-9e2)
 
-pr.add_argument("dim",type=int,default=5)
+pr.add_argument("--dim",type=int,default=5)
 
 
 args = pr.parse_args()
@@ -122,6 +122,13 @@ plt.savefig("mcmc_2d_sample_{}.png".format(date_append))
 #plt.show()
 plt.clf()
 
+freq_list = sampler.chain[:, 50:, 0].flatten()
+tau_list = sampler.chain[:, 50:, 1].flatten()
+amp_list = sampler.chain[:, 50:, -1].flatten()
+
+
+tau_bins = np.logspace(-3,np.log10(max(tau_list)),num_bins)
+amp_bins = np.logspace(-3,np.log10(max(amp_list)),num_bins)
 
 if args.dim>2:
 	with open ("mcmc_freq_tau_amp_list_{}.txt".format(date_append),'w') as f: 
