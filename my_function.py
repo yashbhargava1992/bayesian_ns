@@ -1,10 +1,6 @@
 import numpy as np
 pi = np.pi
 
-
-def log_Poisson (D,N):
-	#~ return D**N*np.exp(-D)/math.factorial(N)
-	return N*np.log(D)-D
 	
 def damped_sin(t,theta):
 	"""
@@ -164,25 +160,6 @@ def single_sin(t,theta):
 	return y
 
 
-def log_likelihood_v1 (t_k,N_k,*par):
-	
-	"""
-	Assumes a poisson process for generating counts. Not possible if we have Gaussian noise of zero mean
-	"""
-	if len(par)==2: tau,freq,amp,phase = par[0],par[1],1,0
-	elif len(par)==3: tau,freq,amp,phase = par[0],par[1],par[2],0
-	elif len(par)==4: tau,freq,amp,phase = par[0],par[1],par[2],par[3]
-	D = damped_sin(t_k,tau,freq,amp,phase)
-	ll = np.sum(log_Poisson(D,N_k))
-	return -ll
-	
-
-def prior_info_v1 (theta):
-	
-	if theta > 0: return 0
-	return -np.inf
-
-
 def mcmc_1d(t,samp,init_guess = 2000,iter_number = 1e4,step = 100, multi_thres = 50,boost = 0.1):
 	
 	"""
@@ -327,16 +304,7 @@ def prior_info_dd (theta):
 
 
 def lnlike_dd (theta,t,s,func):
-	#~ if len(theta)==2:
-		#~ freq,tau = theta
-		#~ amp = 1
-		#~ gamma = None
-		#~ xi = None	
-	#~ elif len(theta)==3 : 
-		#~ freq,tau,amp = theta
-		#~ gamma = None
-		#~ xi = None
-	#~ elif len(theta)==5 : freq,tau,gamma,xi,amp = theta
+	
 	dt 	= t[1]-t[0]
 	nyq_freq = 0.5/dt
 	xf 	= np.linspace (0,nyq_freq,len(t)/2)
