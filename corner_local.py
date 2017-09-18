@@ -1,5 +1,11 @@
 # -*- coding: utf-8 -*-
 
+
+# The functions are written by Foreman et al. (2016) and modified by Yash Bhargava 
+# for generating the plots corresponding to the bayesian analysis
+
+### Last updated:  September 18, 2017
+
 from __future__ import print_function, absolute_import, division
 
 import logging
