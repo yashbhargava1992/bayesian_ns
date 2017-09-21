@@ -19,16 +19,16 @@ import corner_local as cr
 
 
 pr = argparse.ArgumentParser()
-pr.add_argument("--append_text",default="gnh")
+pr.add_argument("--append_text", "-p",default="gnh")
 
-pr.add_argument("--freq",type=float,default=2.3e3)
-pr.add_argument("--tau",type=float,default=23.45e-3)
-pr.add_argument("--amp",type=float,default=0.5)
+pr.add_argument("--freq", "-f",type=float,default=2.3e3)
+pr.add_argument("--tau", "-t",type=float,default=23.45e-3)
+pr.add_argument("--amp", "-a",type=float,default=0.5)
 
-pr.add_argument("--gamma",type=float,default=38.0)
-pr.add_argument("--xi",type=float,default=-9e2)
+pr.add_argument("--gamma","-g",type=float,default=38.0)
+pr.add_argument("--xi", "-x",type=float,default=-9e2)
 
-pr.add_argument("--dim",type=int,default=5)
+pr.add_argument("--dim", "-d",type=int,default=5)
 
 
 args = pr.parse_args()

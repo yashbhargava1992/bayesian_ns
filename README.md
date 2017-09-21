@@ -1,4 +1,7 @@
 # Bayesian_ns
+# Author: Yash Bhargava
+# Updated on : Sept 21, 2017
+
 
 The project is to get a posterior estimation code for various parameters describing a post merger signal of NS Ns coalesence. 
 
@@ -24,7 +27,24 @@ If dims == 2 then the sampling is done over freq and tau
 and so on
 
 
-The function f2_sin assumes a form of the signal (either GNH3/ALF2) which can be switched by 
-commenting/uncommenting the required lines
+The function f2_sin assumes a form of the signal (either GNH3/ALF2) 
 
+
+Note: 
+
+1)If the sampling is done at dimensions fewer than 5, then the parameters which are known 
+must be changed in the definition of the function. 
+
+For e.g. If the assumed signal is of GNH3, and the sampling is done only over freq and tau, 
+then rest of the parameters should be manually forced to GNH3 values. This can be done in the file 
+"my_function.py" by editing the line which looks like this 
+
+freq,tau,gamma,xi,amp,beta=2.42e3,0.01,-3467,2e4,0.5,0			# alf2
+
+The correct values corresponding to the model can be filled here. 
+
+2) If the expected amplitude is incorrectly filled then the simulation may give larger error bars
+
+For e.g. If the expected amplitude is 0.1 of the noise standard deviation and the value assumed by the function 
+(as shown in previous point) is 0.5 then the posterior may not converge to the seed values of freq and tau
 
