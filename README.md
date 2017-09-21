@@ -30,7 +30,18 @@ and so on
 The function f2_sin assumes a form of the signal (either GNH3/ALF2) 
 
 
-Note: 
+# Running the code
+
+The code can be run by following command
+
+python mcmc_actual_data_sim.py -p "alf2_high_2d_jul25" -f 2420 -t 0.01037 -a 10 -g -3467 -x 20000 -d 2
+
+The information about the arguments can be discerned by writing python mcmc_code.py -h 
+
+All the arguments are optional and the default values are those for GNH3 model 
+and code computes for 5 dimensions by default.
+
+#Note: 
 
 1)If the sampling is done at dimensions fewer than 5, then the parameters which are known 
 must be changed in the definition of the function. 
